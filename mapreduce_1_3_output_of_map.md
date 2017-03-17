@@ -1,6 +1,6 @@
-#map的输出结果
+# map的输出结果
 ***
-###数据在map中的流动
+### 数据在map中的流动
 ***
 ![output-of-map](_image/2.output-of-map.png)
 
@@ -21,7 +21,7 @@
 * mainThread调用sortAndSpill()后，mergePart()会将多个溢写文件变成一个文件。
 
 ***
-###Partition
+### Partition
 ***
 ```java
 public void write(K key, V value) throws IOException, InterruptedException {
@@ -33,7 +33,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 前面说过Split是为了分西瓜给MapTask吃，map输出的数据应该分给不同的reduce去处理，那么怎么标示这个数据分给哪个reduce呢？
 * Partition就是实现给数据贴标签功能，就是再次切西瓜把西瓜分好,具体的实现就是使用数字来标记。
 
-####Partitioner的实例化
+#### Partitioner的实例化
 
 ```java
 来自org.apache.hadoop.mapred.NewOutputCollector部分代码
@@ -50,13 +50,13 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 默认的方法是HashPartition
 
 ***
-###Serialize
+### Serialize
 ***
 
 * 该部分和写入缓冲区紧密相关，之后分析
 
 ***
-###整体看MapOutputBuffer存储结构
+### 整体看MapOutputBuffer存储结构
 ***
 ![overview](_image/3.0.MapOutputBuffer.png)
 
@@ -71,14 +71,14 @@ public void write(K key, V value) throws IOException, InterruptedException {
  * 还有一种方法是有combiner使用，MRResultIterator将缓冲区内的数据组织成KV对的读取。
  
 ***
-###Spill
+### Spill
 ***
 * 如果内存缓冲区的数据到达一定的条件，就要把数据写入硬盘，以免占用太多内存
 * spillThread调用的是sortAndSpill()
 * sort就是先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用Writer写入硬盘。
 
-####Sort时从内存缓冲区中读取数据(可以先跳过)
+#### Sort时从内存缓冲区中读取数据(可以先跳过)
 
 ```java
 
@@ -88,7 +88,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
              (kvindices[kvoff + VALSTART] - 
                 kvindices[kvoff + KEYSTART]));
 ```
-####使用快排对数据进行排序
+#### 使用快排对数据进行排序
 
 ```java
 排序使用的是QuickSort
@@ -125,11 +125,11 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 从compare中看出来，先根据partition的大小来排序，再根据key来排序。
 * 排序实际上仅仅是改变了kvoffsets中的数据，其他的没有任何的改变。其实也不能改变第二级索引，之后说明为什么。
 
-####Writer写入硬盘
+#### Writer写入硬盘
 
 * 使用IFile类将数据写入硬盘
 
-#####溢写文件的结构
+##### 溢写文件的结构
 ![spillfile](_image/3.5.spill.png)
 
 * 由于已经排好序，所以相同的Partition的数据是连续的，相同的K的数据也是连续的。
@@ -139,7 +139,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 有专门的索引文件来存储所有的索引。
 
 
-####combiner
+#### combiner
 ```java
             if (combinerRunner == null) {
               // spill directly
@@ -155,7 +155,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * combiner就可以从缓冲区中把内容读取出来，进行处理，写入文件。
 
 ***
-###Merge
+### Merge
 ***
 
 ![Merge合并硬盘中的文件](_image/5.1.Merge.png)
