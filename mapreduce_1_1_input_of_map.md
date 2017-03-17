@@ -1,4 +1,4 @@
-#Map的输入：以TextInputFormat为例
+# Map的输入：以TextInputFormat为例
 ***
 这里解答第一个问题，文本怎么变成(K,V)的。
 一个大体的流程就是:
@@ -9,7 +9,7 @@
  * Split怎么变成(K,V)的？Split是直接按照大小分的，而每行则是按照'\n'来划分的，这两者之间的分界线一般情况下都是不同的，那么横跨两个Split的一行，交给那个MapTask处理？
 
 ***
-###类之间的关系以及功能
+### 类之间的关系以及功能
 ***
 
 ![TextInputFormat](_image/1.TextInputFormat.png)
@@ -24,7 +24,7 @@
 * LineRecordReader通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
 
 ***
-###FileInputFormat
+### FileInputFormat
 ***
 * Split是什么呢？如果说你有一个西瓜，几个人一起吃，那么肯定要切开才能吃。
 
@@ -42,7 +42,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 * 就像切西瓜一样，每个MapTask分到了一个Split
 
 ***
-###TextIputFormat
+### TextIputFormat
 ***
 
 ```java
@@ -63,7 +63,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 * isSplitable说明是否可以Split，毕竟有的是不可以分割的，比如压缩文件。
 * 这个类的主要目的就是实现这么一个通用的接口，可以非常方便的读取各种格式的文件。
 
-#####LineReader
+##### LineReader
 
 该类实现了从一个流中读出一行来，具体实现在readLine方法中
 
@@ -71,13 +71,13 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 * readLine()不对输入做任何的假设，就是当作一个完整的文件读取出一行。
 * 重点问题在于行的分界符是不同的，'\n'是Unix风格，'\r\n'是Windows风格，'\r'是MacOS风格。
 
-#####LineRecordReader
+##### LineRecordReader
 该类有两个重要功能
 
 * 把数据封装成(K,V)
 * 处理Split的边界和行的边界不一致的问题
 
-######封装成KV
+###### 封装成KV
 ```java
 来自org.apache.hadoop.mapreduce.lib.input.LineRecordReader
     nextKeyValue()部分代码{
@@ -99,7 +99,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 * 上面的代码只是nextKeyValue中赋值的两句，可以看出来，K是第几个字节数，V是读入的行的内容
 * getCurrentKey()或者getCurrentValue()直接看代码吧。
 
-######处理边界不一致的问题
+###### 处理边界不一致的问题
 
 ```
 initialize()部分代码
@@ -135,12 +135,12 @@ while (pos < end) {
 * initialize()和getKeyValue()对不同MapTask处理的内容做了微微调整，基本上保证了每个Split由一个MapTask处理的语义。
 
 ***
-###实现自己的InputFormat
+### 实现自己的InputFormat
 ***
 * 如果你不需要实现自己的Split，仅仅是想读取自定义的文件格式，那么只需要实现一个RecordReader类，并且createRecordReader中返回该类的RecordReader对象。比如说，每100字节作为一个(K,V)之类的。
 
 ***
-###总结
+### 总结
 ***
 * 对于外部的调用而言，他不需要考虑内部是如何实现将文本(或者是其他的文件格式)转换成(K,V)的，他只需要通过
  * initialize()来实现初始化
