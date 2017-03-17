@@ -1,5 +1,5 @@
 ***
-#MapTask的数据处理流程
+# MapTask的数据处理流程
 ***
 
 MapTask mapper map之间的关系
@@ -9,10 +9,10 @@ MapTask mapper map之间的关系
 * map就是mapper如何处理数据的一个方法
 
 ***
-###MapTask的流程
+### MapTask的流程
 ***
 
-#####MapTask的run方法
+##### MapTask的run方法
 
 ```
 （来自org.apache.hadoop.mapred.MapTask）
@@ -27,7 +27,7 @@ MapTask mapper map之间的关系
 * 和名字一样，runNewMapper就是启动mapper
 * runNewMapper中的New是指使用了新的API
 
-#####runNewMapper方法的几个作用
+##### runNewMapper方法的几个作用
 
 ```java
 （来自org.apache.hadoop.mapred.MapTask）
@@ -46,7 +46,7 @@ MapTask mapper map之间的关系
 * 最后清理工作
 
 ***
-###mapper运行的核心逻辑
+### mapper运行的核心逻辑
 ***
 
 ```java
@@ -64,7 +64,7 @@ MapTask mapper map之间的关系
         context.write((KEYOUT) key, (VALUEOUT) value);
     }
 ```
-#####流程如下：
+##### 流程如下：
 * setup方法做了一些配置，默认是空。
 * 不断的读取下一个(K,V)，并交给map逐个处理KV
 * 默认的map方法就是什么都不做，输入和输出时一样的
@@ -72,25 +72,25 @@ MapTask mapper map之间的关系
 * 这里使用的getCurrentValue()是对RecordReader的getCurrentValue()对应封装。
 * write方法是对输出对象的write方法的封装
 
-#####以WordCount来举例
+##### 以WordCount来举例
 * 类LineReader可以从流中读取一行，类LineRecordReader将这一行变成一个键值对。
 * 之后如何获取这些键值对并且处理呢？  注意： map()只处理**一个**键值对
 * 但是每个split中肯定不止一行，那么是如何不断的读取每一行，生成一个个的键值对来处理呢？
 * 答案就是这里，mapper在运行的时候不断的获得键值对，不断的交给map去处理。
 
 ***
-###输入的实例化
+### 输入的实例化
 ***
 #####InputFormat和RecordReader的区别
 * InputFormat和RecordReader的分别初始化，感觉有点奇怪
 * 因为InputFormat关注于文件如何分割，所以有isSplitable、getSplits方法
 * 而RecordReader关注于将一个文件中的内容转换成了键值对
 
-#####以WordCount来举例
+##### 以WordCount来举例
 * FileInputFormat将一个文件分成几个split
 * LineRecordReader将文本封装为(K,V),K是偏移字节数，V是每行的内容。
 
-#####InputFormat
+##### InputFormat
 ```java
 （来自org.apache.hadoop.mapred.MapTask）
 runNewMapper()部分代码
@@ -104,7 +104,7 @@ runNewMapper()部分代码
 * 可以看出来，调用了getInputFormatClass，这样可以获取到我们自己设置的输入类
 * 默认输入方法是TextInputFormat
 
-#####RecordReader
+##### RecordReader
 
 ```java
 runNewMapper()中初始化RecordReader
@@ -118,11 +118,11 @@ runNewMapper()中初始化RecordReader
 * 这个输入对象才能够读取文本，封装了键值对，提供nextKeyValue(),getCurrentkey()，getCurrentValue()等方法。
 
 ***
-###输出的实例化
+### 输出的实例化
 ***
 * map处理后的输出是放在缓冲区中
 
-####RecordWriter
+#### RecordWriter
 
 ```java
 （来自org.apache.hadoop.mapred.MapTask）
@@ -136,7 +136,7 @@ runNewMapper()中初始化RecordWriter
       }
 ```
 
-#####NewOutputCollector中的write()
+##### NewOutputCollector中的write()
 
 * 可以从map的运行中看出，调用的输出对象context的write方法,其实就是out的write方法
 
@@ -158,7 +158,7 @@ collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 * 收集的数据就是(key,value,partition)三个数据作为一个逻辑单元。至于为什么要加入partition，之后再解释。
 * 现在整体的架构已经清楚了，那么我们之后重点关注(K,V)在经过map处理之后又发生了什么。
 
-###总结
+### 总结
 * MapTask负责初始化各种输入、处理、输出的对象
 * InputFormat对象和RecordReader对象负责将数据封装好输入
 * mapper对象中不断的读取数据，通过map方法去处理
