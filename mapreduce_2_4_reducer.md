@@ -1,5 +1,5 @@
 ***
-###Reducer运行的核心逻辑
+### Reducer运行的核心逻辑
 ***
 ```java
     public void run(Context context) throws IOException, InterruptedException {
@@ -17,14 +17,14 @@
         }
     }
 ```
-#####流程如下：
+##### 流程如下：
 * setup方法做了一些配置，默认是空。
 * 不断的读取下一个(K,List&lt;V>)，并交给reduce一个一个KV来处理
 * 默认的reduce方法就是什么都不做，输入和输出时一样的
 * 这里使用的getCurrentKey()和getCurrentValue()是对输入的封装。
 * 这里使用的write方法是对输出对象的封装
 
-#####以WordCount来举例
+##### 以WordCount来举例
 * 在COPY Phase和SORT Pahse时，map处理之后的数据已经收集好了
 * 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,List&lt;,V>)形式的**一个**键值对
 * 但是每个map处理之后的数据中肯定非常多而且都是(K,V)形式的，那么是如何把处理所有的键值呢？
@@ -32,9 +32,9 @@
 * Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
 
 ***
-###输入的实例化
+### 输入的实例化
 ***
-#####数据的来源
+##### 数据的来源
 ```
     ReduceTask中的run方法
     RawKeyValueIterator rIter = reduceCopier.createKVIterator(job, rfs, reporter);
@@ -53,7 +53,7 @@
 * 还有一个值得注意的地方是数据源中的数据是(K,V)形式的，而nextKey得到的则是(K,List&lt;V>)
 * 那么如何发生的(K,V)--->(K,List&lt;,V>)呢？下面将解决这个问题
 
-#####(K,V)--->(K,List&lt;V>)
+##### (K,V)--->(K,List&lt;V>)
 Context继承了ReduceContext,实现的方法都在ReduceContext中
 
 首先，如果自己实现大概会是这个样子的
@@ -91,7 +91,7 @@ Context继承了ReduceContext,实现的方法都在ReduceContext中
 应该说，将输入的这个Iterator作为缓冲的中间层，非常优雅的解决了只有一层总是会多读一个KV的问题
 
 ***
-###输出的实例化
+### 输出的实例化
 ***
 ```
      org.apache.hadoop.mapreduce.RecordWriter<OUTKEY,OUTVALUE> trackedRW = 
