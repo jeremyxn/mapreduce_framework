@@ -100,7 +100,7 @@ downHeap heap[1]的元素向下移动，用途是heap[1]的值变化时调整top
 
 * TODO
 
-#####（MapTask）将溢写文件合并
+##### （MapTask）将溢写文件合并
 ![Merge合并硬盘中的文件](_image/5.1.Merge.png)
 
 * 图中只画了数据文件的合并，当然索引文件也是合并的
