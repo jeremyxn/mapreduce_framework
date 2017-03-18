@@ -1,4 +1,4 @@
-# ReduceTas 的流程
+# ReduceTask 的流程
 ***
 
 ReduceTask reducer reduce之间的关系
@@ -12,7 +12,7 @@ ReduceTask reducer reduce之间的关系
  * REDUCE Phase
 
 ***
-### ReduceTask中的流程
+### ReduceTask 中的流程
 ***
 
 ```java
