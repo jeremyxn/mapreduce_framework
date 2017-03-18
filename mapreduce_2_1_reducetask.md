@@ -1,4 +1,4 @@
-#ReduceTask的流程
+# ReduceTas 的流程
 ***
 
 ReduceTask reducer reduce之间的关系
@@ -12,7 +12,7 @@ ReduceTask reducer reduce之间的关系
  * REDUCE Phase
 
 ***
-###ReduceTask中的流程
+### ReduceTask中的流程
 ***
 
 ```java
@@ -40,7 +40,7 @@ ReduceTask reducer reduce之间的关系
  * REDUCE Phase
 
 ***
-###COPY Phase
+### COPY Phase
 ***
 ```java
     ReduceTask中的run方法部分代码
@@ -63,7 +63,7 @@ ReduceTask reducer reduce之间的关系
 * 复制过来的数据，部分存在硬盘中，部分存在内存中
 
 ***
-###SORT Phase
+### SORT Phase
 ***
 ```
 ReduceTask中的run方法
@@ -84,7 +84,7 @@ ReduceTask中的run方法
 * 需要将这些数据再次封装成KV
 
 ***
-###Reducer运行的核心逻辑
+### Reducer运行的核心逻辑
 ***
 ```java
     public void run(Context context) throws IOException, InterruptedException {
@@ -102,21 +102,21 @@ ReduceTask中的run方法
         }
     }
 ```
-#####流程如下：
+##### 流程如下：
 * setup方法做了一些配置，默认是空。
 * 不断的读取下一个(K,List&lt;V>)，并交给reduce一个一个KV来处理
 * 默认的reduce方法就是什么都不做，输入和输出时一样的
 * 这里使用的getCurrentKey()和getCurrentValue()是对输入的封装。
 * 这里使用的write方法是对输出对象的封装
 
-#####以WordCount来举例
+##### 以WordCount来举例
 * 在COPY Phase和SORT Pahse时，map处理之后的数据已经收集好了
 * 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,List&lt;V>)形式的**一个**键值对
 * 但是每个map处理之后的数据中肯定非常多而且都是(K,V)形式的，那么是如何把处理所有的键值呢？
 * 这里回答如何不断获取，下面一节回答如何(K,V)->(K,List&lt;V>)
 * Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
 
-###总结
+### 总结
 * COPY阶段将所有分散在其他机器上的map处理过的数据收集过来
 * SORT将这么多的文件组织成KV对
 * reducer负责处理数据
