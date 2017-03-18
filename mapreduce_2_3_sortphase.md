@@ -1,4 +1,4 @@
-#SORT Phase
+# SORT Phase
 ***
 
 * 在经过COPY Phase之后，部分文件在内存中，部分文件在硬盘中
