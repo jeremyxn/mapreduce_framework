@@ -1,8 +1,8 @@
-#Merge
+# Merge
 ***
-###概述
+### 概述
 ***
-###Merger Class
+### Merger Class
 * Merger Class指使用的这个类
 * Merger.merge是将多个文件中的不同部分封装已经排序的Iterator
 * Merger.writeFile是写入文件
@@ -16,7 +16,7 @@
 * 如何进行封装来屏蔽文件来源的复杂性？请看Segment小节
 * 如何对数据再次进行排序？请看MergeQueue小节
 
-###IFile
+### IFile
 * Merge和IFile类紧密的联系在一起
 * 从map处理过的数据Spill到硬盘上的使用IFile.Writer来写入的
 * 直到reduce的读入，硬盘中的文件也是使用的IFile.Reader
@@ -24,7 +24,7 @@
 * IFile在硬盘中的存储格式就是像下面这样
 ![spillfile](_image/3.5.spill.png)
 
-#####索引文件和IndexRecord
+##### 索引文件和IndexRecord
 ```java
 IndexRecord中的结构
   long startOffset;
@@ -32,7 +32,7 @@ IndexRecord中的结构
   long partLength;
 ```
 
-#####每条记录的结构
+##### 每条记录的结构
 ```
 IFile中Writer的append方法：
 
@@ -41,7 +41,7 @@ IFile中Writer的append方法：
    out.write(buffer.getData(), 0, buffer.getLength());       // data
 ```
 
-###Segment
+### Segment
 * 前面讲到，文件的来源很复杂，应该将文件来源封装成一个简单的Iterator
 * Segment是什么
  * 每个溢写文件都是按照Partition排序的，就是说，相同Partition的都是连续存放的
@@ -55,7 +55,7 @@ IFile中Writer的append方法：
     long segmentLength;
 ```
 
-###MergeQueue
+### MergeQueue
 
 * MergeQueue.merge在Segment实现Iterator的基础上，对数据排序后，封装成一个新的Iterator
 * MergeQueue extends PriorityQueue implements RawKeyValueIterator
@@ -84,19 +84,19 @@ downHeap heap[1]的元素向下移动，用途是heap[1]的值变化时调整top
 * 如果segment没有元素了，那么就从队列中移除一个即可pop
 
 
-###使用Merge的地方
+### 使用Merge的地方
 
 * (MapTask)Spill完成之后，将所有的溢写文件merge为一个文件
 * (ReduceTask中COPY Phase)InMemFSMergeThread和LocalFSMerger
 * (ReduceTask中SORT Phase)createKVIterator
 
 
-###Merge的执行条件
+### Merge的执行条件
 
 * TODO
 
 
-###Merge时文件个数的变化
+### Merge时文件个数的变化
 
 * TODO
 
@@ -113,7 +113,7 @@ downHeap heap[1]的元素向下移动，用途是heap[1]的值变化时调整top
 * 然后写入文件
 * 如果由combine在写入硬盘前会执行combine
 
-#####(ReduceTask中COPY Phase)InMemFSMergeThread
+##### (ReduceTask中COPY Phase)InMemFSMergeThread
 ![将内存中的数据变成Segment](_image/5.2.InMemFSMergeThread.png)
 
 * 图中就是如何将内存中存储的文件(MapOutput对象)变成Segment对象
@@ -123,14 +123,14 @@ downHeap heap[1]的元素向下移动，用途是heap[1]的值变化时调整top
 * 写入使用IFile.Writer类，最后只有一个文件
 * Merge之后的文件写入硬盘，通过mapOutputFilesOnDisk索引
 
-#####LocalFSMerger
+##### LocalFSMerger
 ![Merge合并硬盘中的文件](_image/5.1.Merge.png)
 
 * 这里和Map端的Merge类似
 * Merger.merge封装成Iterator
 * Merger.writeFile写入文件
 
-#####(SORT Phase)createKVIterator
+##### (SORT Phase)createKVIterator
 
 * 在经过COPY Phase之后，部分文件在内存中，部分文件在硬盘中
 * 显然这在不同的介质中，而且不是有序的
@@ -139,7 +139,7 @@ downHeap heap[1]的元素向下移动，用途是heap[1]的值变化时调整top
 * 使用上面两个建立了最后的 List&lt;Segment&lt;K,V>> finalSegments
 * 最后使用Merger.merge返回MergeQueue，这个可排序的Iterator
 
-###Merger的设计框架
+### Merger的设计框架
 
 * Merger需要将多个文件和并
  * 输入数据：数据可能同时是来自硬盘和内存中---->Segment解决数据来源问题
